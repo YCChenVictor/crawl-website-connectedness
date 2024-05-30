@@ -1,0 +1,10 @@
+{
+  "name": "crawl-website-connectedness",
+  "version": "1.0.0",
+  "description": "Scrape websites connectedness",
+  "main": "index.js",
+  "repository": "git@github.com:YCChenVictor/crawl-website-connectedness.git",
+  "author": "YCChen <victor.yong.jhe.chen@gmail.com>",
+  "license": "MIT",
+  "private": null
+}
