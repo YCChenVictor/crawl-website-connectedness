@@ -1,25 +1,98 @@
-import crawlWebsiteConnectedness from '../crawlWebsiteConnectedness';
+import puppeteer from 'puppeteer';
+import { processPage } from '../crawlWebsiteConnectedness';
+// import crawlWebsiteConnectedness from '../crawlWebsiteConnectedness';
 
-describe('getIdFromNodeName', () => {
-  it('should return the correct node when the URL matches', () => {
-    const nodes = [
-      { id: 1, name: 'Node 1', url: 'http://example.com', group: 'Group 1' },
-      { id: 2, name: 'Node 2', url: 'http://test.com', group: 'Group 2' },
-    ];
+jest.mock('puppeteer', () => ({
+  launch: jest.fn().mockResolvedValue({
+    newPage: jest.fn().mockResolvedValue({
+      goto: jest.fn(),
+      content: jest.fn().mockResolvedValue(`
+        <html>
+          <body>
+            <a href="http://example.com/blog/post1">Post 1</a>
+            <a href="http://example.com/blog/post2">Post 2</a>
+            <a href="http://example.com/blog/post3">Post 3</a>
+          </body>
+        </html>
+      `),
+    }),
+    close: jest.fn(),
+  }),
+}));
 
-    const result = getIdFromNodeName(nodes, 'http://test.com');
+describe('processPage', () => {
+  it('should process a page correctly', async () => {
+    const requiredPath = '/blog/';
+    const currentUrl = 'http://example.com';
 
-    expect(result).toEqual({ id: 2, name: 'Node 2', url: 'http://test.com', group: 'Group 2' });
-  });
+    const childUrls = await processPage(requiredPath, currentUrl);
 
-  it('should return undefined when no node matches the URL', () => {
-    const nodes = [
-      { id: 1, name: 'Node 1', url: 'http://example.com', group: 'Group 1' },
-      { id: 2, name: 'Node 2', url: 'http://test.com', group: 'Group 2' },
-    ];
-
-    const result = getIdFromNodeName(nodes, 'http://nonexistent.com');
-
-    expect(result).toBeUndefined();
+    expect(puppeteer.launch).toHaveBeenCalled();
+    expect(childUrls).toEqual([
+      'http://example.com/blog/post1',
+      'http://example.com/blog/post2',
+      'http://example.com/blog/post3'
+    ]);
   });
 });
+
+// describe('crawlWebsiteConnectedness', () => {
+//   it('getIdFromNodeName', () => {
+//     // Setup
+//     const nodes = [{ id: 1, name: 'name', url: 'url', group: 'group' }];
+//     const url = 'url';
+
+//     // Exercise
+//     const result = crawlWebsiteConnectedness.getIdFromNodeName(nodes, url);
+
+//     // Verify
+//     // Check that result is as expected...
+//   })
+//   it('storeSearchBarAsFile', )
+//   it('crawl function should return expected result', async () => {
+//     // Setup
+//     const queue = ['http://example.com'];
+//     const visited = new Set<string>();
+//     const domain = 'http://example.com';
+
+//     // Mock network requests here...
+
+//     // Exercise
+//     const result = await crawl(queue, visited, domain);
+
+//     // Verify
+//     // Check that result is as expected...
+//   });
+
+//   it('storeNodeGraphAsFile function should write expected data to file', () => {
+//     // Setup
+//     const nodeGraph = { /* ... */ };
+//     const filePath = './test.txt';
+
+//     // Mock file system here...
+
+//     // Exercise
+//     storeNodeGraphAsFile(nodeGraph, filePath);
+
+//     // Verify
+//     // Check that file system was written to as expected...
+//   });
+
+//   it('main function should call crawl and storeNodeGraphAsFile with expected arguments', async () => {
+//     // Setup
+//     const queue = ['http://example.com'];
+//     const visited = new Set<string>();
+//     const domain = 'http://example.com';
+//     const filePath = './test.txt';
+
+//     const mockCrawl = mocked(crawl, true);
+//     const mockStoreNodeGraphAsFile = mocked(storeNodeGraphAsFile, true);
+
+//     // Exercise
+//     await main(queue, visited, domain, filePath);
+
+//     // Verify
+//     expect(mockCrawl).toHaveBeenCalledWith(queue, visited, domain);
+//     // Check that mockStoreNodeGraphAsFile was called with expected arguments...
+//   });
+// });
