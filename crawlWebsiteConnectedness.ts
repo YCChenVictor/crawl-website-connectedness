@@ -60,7 +60,7 @@ const getIdFromNodeName = (nodes: { id: number, name: string, url: string, group
 //   items.push(item);
 // }
 
-const processPage = async (requiredPath: string, currentUrl: string) => {
+const processPage = async (currentUrl: string, requiredPath: string = '') => {
   const childUrls: string[] = [];
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
@@ -82,28 +82,24 @@ const processPage = async (requiredPath: string, currentUrl: string) => {
   return childUrls;
 }
 
-// const crawl = async (queue: string[], visited: Set<string>, domain: string): Promise<{ [key: string]: string[] }> => {
-//   const result: { [key: string]: string[] } = {};
-//   const childNodes: string[] = [];
-//   const currentUrl = queue.shift();
+const crawl = async (
+  queue: string[],
+  visited: Set<string>,
+  result: { [key: string]: string[] } = {}
+): Promise<{ [key: string]: string[] }> => {
+  const currentUrl = queue.shift();
 
-//   if (!currentUrl) {
-//     return result;
-//   }
+  if (!currentUrl) {
+    return result;
+  }
+  if(!visited.has(currentUrl)) {
+    const childUrls = await processPage(currentUrl);
+    visited.add(currentUrl);
+    result[currentUrl] = childUrls;
+  }
 
-//   if(visited.has(currentUrl)) {
-//     return await crawl(queue, visited, domain);
-//   }
-
-//   visited.add(currentUrl);
-  
-//   await processPage(currentUrl, domain, queue, childNodes);
-
-//   const parentNode = currentUrl.replace(domain, '');
-//   result[parentNode] = childNodes;
-
-//   return await crawl(queue, visited, domain);
-// }
+  return await crawl(queue, visited, result);
+}
 
 // const storeSearchBarAsFile = (filePath, result) => {
 //   // Convert JSON data to a string
@@ -149,5 +145,7 @@ const processPage = async (requiredPath: string, currentUrl: string) => {
 //   }
 // };
 
-export { processPage }
-// export default main;
+export {
+  processPage,
+  crawl
+}

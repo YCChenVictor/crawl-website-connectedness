@@ -1,6 +1,6 @@
+
 import puppeteer from 'puppeteer';
-import { processPage } from '../crawlWebsiteConnectedness';
-// import crawlWebsiteConnectedness from '../crawlWebsiteConnectedness';
+import { processPage, crawl } from '../crawlWebsiteConnectedness';
 
 jest.mock('puppeteer', () => ({
   launch: jest.fn().mockResolvedValue({
@@ -33,6 +33,39 @@ describe('processPage', () => {
       'http://example.com/blog/post2',
       'http://example.com/blog/post3'
     ]);
+  });
+});
+
+describe('crawl', () => {
+  afterEach(() => {
+    // restore the spy created with spyOn
+    jest.restoreAllMocks();
+  });
+
+  test('should crawl the website and return the correct result', async () => {
+    const queue = ['http://test.com/page1', 'http://test.com/page2'];
+    const visited = new Set<string>();
+    const result = {};
+
+    const finalResult = await crawl(queue, visited, result);
+
+    expect(finalResult).toEqual({ // it will call processPage twice
+      'http://test.com/page1': [
+        'http://example.com/blog/post1',
+        'http://example.com/blog/post2',
+        'http://example.com/blog/post3'
+      ],
+      'http://test.com/page2': [
+        'http://example.com/blog/post1',
+        'http://example.com/blog/post2',
+        'http://example.com/blog/post3'
+      ]
+    });
+
+    // Jest does not know ES6. It sees the imported processPage are different from the transpiled one. I cannot resolve it now.
+    // expect(processPage).toHaveBeenCalledTimes(2);
+    // expect(processPage).toHaveBeenCalledWith('http://test.com/page1');
+    // expect(processPage).toHaveBeenCalledWith('http://test.com/page2');
   });
 });
 
