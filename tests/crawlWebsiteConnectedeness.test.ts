@@ -77,7 +77,10 @@ describe('crawl', () => {
     const visited = new Set<string>();
     const result = {};
 
-    const finalResult = await crawl(queue, visited, result);
+    // Spy on console.log
+    const logSpy = jest.spyOn(console, 'log');
+
+    const finalResult = await crawl(queue, visited, result, true);
 
     expect(finalResult).toEqual({ // it will call processPage twice
       'http://test.com/page1': [
@@ -90,6 +93,10 @@ describe('crawl', () => {
         'http://test.com/page2/post2',
       ]
     });
+
+    // Check if console.log was called with the correct arguments
+    expect(logSpy).toHaveBeenCalledWith('Crawling: http://test.com/page1');
+    expect(logSpy).toHaveBeenCalledWith('Crawling: http://test.com/page2');
 
     // Jest does not know ES6. It sees the imported processPage are different from the transpiled one. I cannot resolve it now.
     // expect(processPage).toHaveBeenCalledTimes(2);

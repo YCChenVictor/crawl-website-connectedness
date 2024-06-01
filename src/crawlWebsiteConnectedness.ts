@@ -85,7 +85,8 @@ const processPage = async (currentUrl: string, requiredPath: string = '') => {
 const crawl = async (
   queue: string[],
   visited: Set<string> = new Set(),
-  result: { [key: string]: string[] } = {}
+  result: { [key: string]: string[] } = {},
+  shouldLog: boolean = false
 ): Promise<{ [key: string]: string[] }> => {
   const currentUrl = queue.shift();
 
@@ -93,12 +94,15 @@ const crawl = async (
     return result;
   }
   if(!visited.has(currentUrl)) {
+    if (shouldLog) {
+      console.log(`Crawling: ${currentUrl}`); // Log the current URL
+    }
     const childUrls = await processPage(currentUrl);
     visited.add(currentUrl);
     result[currentUrl] = childUrls;
   }
 
-  return await crawl(queue, visited, result);
+  return await crawl(queue, visited, result, shouldLog);
 }
 
 // const storeSearchBarAsFile = (filePath, result) => {
