@@ -1,6 +1,6 @@
 
 import puppeteer, { Page, Browser } from 'puppeteer';
-import { processPage, crawl } from '../crawlWebsiteConnectedness';
+import { processPage, crawl } from '../src/crawlWebsiteConnectedness';
 
 afterEach(() => jest.resetAllMocks());
 
