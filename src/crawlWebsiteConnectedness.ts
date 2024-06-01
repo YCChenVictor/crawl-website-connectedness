@@ -60,7 +60,7 @@ import path from 'path';
 //   items.push(item);
 // }
 
-const processPage = async (currentUrl: string, requiredPath: string = '') => {
+const processPage = async (currentUrl: string) => {
   const childUrls: string[] = [];
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
@@ -73,7 +73,7 @@ const processPage = async (currentUrl: string, requiredPath: string = '') => {
   $('a').each((i, link) => {
     const href = $(link).attr('href');
     // should add picky mechanism
-    if (href && href.includes(requiredPath) && !href.includes('#')) {
+    if (href && !href.includes('#')) {
       childUrls.push(href);
     }
   });
@@ -86,23 +86,25 @@ const crawl = async (
   queue: string[],
   visited: Set<string> = new Set(),
   result: { [key: string]: string[] } = {},
-  shouldLog: boolean = false
+  shouldLog: boolean = false,
+  requiredPath: string = ''
 ): Promise<{ [key: string]: string[] }> => {
   const currentUrl = queue.shift();
 
   if (!currentUrl) {
     return result;
   }
-  if(!visited.has(currentUrl)) {
+  if(!visited.has(currentUrl) && currentUrl.includes(requiredPath)) {
     if (shouldLog) {
       console.log(`Crawling: ${currentUrl}`); // Log the current URL
     }
     const childUrls = await processPage(currentUrl);
     visited.add(currentUrl);
     result[currentUrl] = childUrls;
+    queue.push(...childUrls);
   }
 
-  return await crawl(queue, visited, result, shouldLog);
+  return await crawl(queue, visited, result, shouldLog, requiredPath);
 }
 
 // const storeSearchBarAsFile = (filePath, result) => {

@@ -47,10 +47,9 @@ beforeEach(() => {
 
 describe('processPage', () => {
   test('should process a page correctly', async () => {
-    const requiredPath = '';
     const currentUrl = 'http://test.com/page1';
 
-    const childUrls = await processPage(currentUrl, requiredPath);
+    const childUrls = await processPage(currentUrl);
 
     expect(puppeteer.launch).toHaveBeenCalled();
     expect(childUrls).toEqual([
@@ -59,16 +58,6 @@ describe('processPage', () => {
       'http://test.com/page1/post3'
     ]);
   });
-
-  test('should not return childUrls if not matching required path', async () => {
-    const requiredPath = '/required/';
-    const currentUrl = 'http://test.com/page1';
-
-    const childUrls = await processPage(currentUrl, requiredPath);
-
-    expect(puppeteer.launch).toHaveBeenCalled();
-    expect(childUrls).toEqual([]);
-  });
 });
 
 describe('crawl', () => {
@@ -76,10 +65,7 @@ describe('crawl', () => {
     const queue = ['http://test.com/page1', 'http://test.com/page2'];
     const visited = new Set<string>();
     const result = {};
-
-    // Spy on console.log
     const logSpy = jest.spyOn(console, 'log');
-
     const finalResult = await crawl(queue, visited, result, true);
 
     expect(finalResult).toEqual({ // it will call processPage twice
@@ -88,10 +74,15 @@ describe('crawl', () => {
         'http://test.com/page1/post2',
         'http://test.com/page1/post3'
       ],
+      "http://test.com/page1/post1": [],
+      "http://test.com/page1/post2": [],
+      "http://test.com/page1/post3": [],
       'http://test.com/page2': [
         'http://test.com/page2/post1',
         'http://test.com/page2/post2',
-      ]
+      ],
+      'http://test.com/page2/post1': [],
+      'http://test.com/page2/post2': [],
     });
 
     // Check if console.log was called with the correct arguments
@@ -102,6 +93,27 @@ describe('crawl', () => {
     // expect(processPage).toHaveBeenCalledTimes(2);
     // expect(processPage).toHaveBeenCalledWith('http://test.com/page1');
     // expect(processPage).toHaveBeenCalledWith('http://test.com/page2');
+  });
+
+  test('should crawl only the required path if provided', async () => {
+    const queue = ['http://test.com/page1', 'http://test.com/page2'];
+    const visited = new Set<string>();
+    const result = {};
+    const logSpy = jest.spyOn(console, 'log');
+    const requiredPath = 'page1';
+    const resultWithRequiredPath = await crawl(queue, visited, result, true, requiredPath);
+
+    // Expect only the required path and its posts to be crawled
+    expect(resultWithRequiredPath).toEqual({
+      'http://test.com/page1': [
+        'http://test.com/page1/post1',
+        'http://test.com/page1/post2',
+        'http://test.com/page1/post3'
+      ],
+      "http://test.com/page1/post1": [],
+      "http://test.com/page1/post2": [],
+      "http://test.com/page1/post3": [],
+    });
   });
 });
 
