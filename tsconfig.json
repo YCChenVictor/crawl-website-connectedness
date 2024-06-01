@@ -19,4 +19,8 @@
     "declaration": true,
     "allowSyntheticDefaultImports": true,
   },
+  "tsc-alias": {
+    "resolveFullPaths": true,
+    "verbose": false
+  }
 }
