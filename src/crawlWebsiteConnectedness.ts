@@ -84,7 +84,7 @@ const processPage = async (currentUrl: string, requiredPath: string = '') => {
 
 const crawl = async (
   queue: string[],
-  visited: Set<string>,
+  visited: Set<string> = new Set(),
   result: { [key: string]: string[] } = {}
 ): Promise<{ [key: string]: string[] }> => {
   const currentUrl = queue.shift();
