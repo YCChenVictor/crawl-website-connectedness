@@ -1,47 +1,77 @@
 
-import puppeteer from 'puppeteer';
+import puppeteer, { Page, Browser } from 'puppeteer';
 import { processPage, crawl } from '../crawlWebsiteConnectedness';
 
-jest.mock('puppeteer', () => ({
-  launch: jest.fn().mockResolvedValue({
-    newPage: jest.fn().mockResolvedValue({
-      goto: jest.fn(),
-      content: jest.fn().mockResolvedValue(`
-        <html>
-          <body>
-            <a href="http://example.com/blog/post1">Post 1</a>
-            <a href="http://example.com/blog/post2">Post 2</a>
-            <a href="http://example.com/blog/post3">Post 3</a>
-          </body>
-        </html>
-      `),
-    }),
+afterEach(() => jest.resetAllMocks());
+
+beforeEach(() => {
+  const mockContent = jest.fn();
+  const mockGoto = jest.fn().mockImplementation((url) => {
+    switch (url) {
+      case 'http://test.com/page1':
+        mockContent.mockResolvedValue(`
+          <html>
+            <body>
+              <a href="http://test.com/page1/post1">Post 1</a>
+              <a href="http://test.com/page1/post2">Post 2</a>
+              <a href="http://test.com/page1/post3">Post 3</a>
+            </body>
+          </html>
+        `);
+        break;
+      case 'http://test.com/page2':
+        mockContent.mockResolvedValue(`
+          <html>
+            <body>
+              <a href="http://test.com/page2/post1">Post 1</a>
+              <a href="http://test.com/page2/post2">Post 2</a>
+            </body>
+          </html>
+        `);
+        break;
+      default:
+        mockContent.mockResolvedValue('');
+    }
+    return Promise.resolve();
+  });
+  const mockPage: Partial<Page> = {
+    content: mockContent,
+    goto: mockGoto,
+  };
+  const mockBrowser: Partial<Browser> = {
+    newPage: jest.fn().mockResolvedValue(mockPage),
     close: jest.fn(),
-  }),
-}));
+  };
+  jest.spyOn(puppeteer, 'launch').mockResolvedValue(mockBrowser as Browser);
+});
 
 describe('processPage', () => {
-  it('should process a page correctly', async () => {
-    const requiredPath = '/blog/';
-    const currentUrl = 'http://example.com';
+  test('should process a page correctly', async () => {
+    const requiredPath = '';
+    const currentUrl = 'http://test.com/page1';
 
-    const childUrls = await processPage(requiredPath, currentUrl);
+    const childUrls = await processPage(currentUrl, requiredPath);
 
     expect(puppeteer.launch).toHaveBeenCalled();
     expect(childUrls).toEqual([
-      'http://example.com/blog/post1',
-      'http://example.com/blog/post2',
-      'http://example.com/blog/post3'
+      'http://test.com/page1/post1',
+      'http://test.com/page1/post2',
+      'http://test.com/page1/post3'
     ]);
+  });
+
+  test('should not return childUrls if not matching required path', async () => {
+    const requiredPath = '/required/';
+    const currentUrl = 'http://test.com/page1';
+
+    const childUrls = await processPage(currentUrl, requiredPath);
+
+    expect(puppeteer.launch).toHaveBeenCalled();
+    expect(childUrls).toEqual([]);
   });
 });
 
 describe('crawl', () => {
-  afterEach(() => {
-    // restore the spy created with spyOn
-    jest.restoreAllMocks();
-  });
-
   test('should crawl the website and return the correct result', async () => {
     const queue = ['http://test.com/page1', 'http://test.com/page2'];
     const visited = new Set<string>();
@@ -51,14 +81,13 @@ describe('crawl', () => {
 
     expect(finalResult).toEqual({ // it will call processPage twice
       'http://test.com/page1': [
-        'http://example.com/blog/post1',
-        'http://example.com/blog/post2',
-        'http://example.com/blog/post3'
+        'http://test.com/page1/post1',
+        'http://test.com/page1/post2',
+        'http://test.com/page1/post3'
       ],
       'http://test.com/page2': [
-        'http://example.com/blog/post1',
-        'http://example.com/blog/post2',
-        'http://example.com/blog/post3'
+        'http://test.com/page2/post1',
+        'http://test.com/page2/post2',
       ]
     });
 

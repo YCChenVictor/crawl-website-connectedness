@@ -64,10 +64,10 @@ const processPage = async (currentUrl: string, requiredPath: string = '') => {
   const childUrls: string[] = [];
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
-  const html = await page.content();
-  const $ = cheerio.load(html);
 
   await page.goto(currentUrl, { waitUntil: 'networkidle2' });
+  const html = await page.content();
+  const $ = cheerio.load(html);
   // comment out currently
   // getArticleContent($, currentUrl);
   $('a').each((i, link) => {
