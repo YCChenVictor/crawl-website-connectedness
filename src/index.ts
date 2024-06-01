@@ -1,9 +1,5 @@
 // Import the functions from the crawlWebsiteConnectedness.ts file
-// import * as crawlWebsiteConnectedness from './crawlWebsiteConnectedness';
-
-const test = function() {
-  return 'test'
-}
+import { processPage, crawl } from './crawlWebsiteConnectedness';
 
 // Export the functions
-export { test };
+export { processPage, crawl };
