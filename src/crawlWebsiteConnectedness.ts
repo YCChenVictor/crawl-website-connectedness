@@ -3,7 +3,7 @@ import fs from 'fs';
 // import randomColor from 'randomcolor';
 import puppeteer from 'puppeteer';
 import path from 'path';
-import url from 'url';
+import * as url from 'url';
 
 // const giveColorByGroupTo = (nodes: { id: number, name: string, url: string, group: any, color?: string }[]) => {
 //   const groups = [...new Set(nodes.map(node => node.group))];
@@ -88,6 +88,7 @@ const processPage = async (currentUrl: string, baseUrl: string = '') => {
 }
 
 const crawl = async (
+  startPoint: string,
   queue: string[],
   visited: Set<string> = new Set(),
   result: { [key: string]: string[] } = {},
@@ -100,7 +101,7 @@ const crawl = async (
   if (!currentUrl) {
     return result;
   }
-  if(!visited.has(currentUrl) && currentUrl.includes(requiredPath)) {
+  if(!visited.has(currentUrl) && currentUrl.includes(requiredPath) && currentUrl.startsWith(startPoint)) {
     if (shouldLog) {
       console.log(`Crawling: ${currentUrl}`); // Log the current URL
     }
@@ -110,7 +111,11 @@ const crawl = async (
     queue.push(...childUrls.filter(url => !visited.has(url)));
   }
 
-  return await crawl(queue, visited, result, shouldLog, requiredPath, baseUrl);
+  return await crawl(startPoint, queue, visited, result, shouldLog, requiredPath, baseUrl);
+}
+
+const main = (startPoint: string) => {
+  return crawl(startPoint, [startPoint]);
 }
 
 // const storeSearchBarAsFile = (filePath, result) => {
@@ -144,20 +149,5 @@ const crawl = async (
 //   }
 // };
 
-// const main = async (queue: string[], visited: Set<string>, domain: string, nodeGraphStoreFilePath: string) => {
-//   // should remove domain
-//   try {
-//     const crawlResult = await crawl(queue, visited, domain);
-//     // comment out currently
-//     // storeSearchBarAsFile({"items": items}, crawlResult)
-//     // storeNodeGraphAsFile(desiredFormat(crawlResult), nodeGraphStoreFilePath);
-//     return crawlResult
-//   } catch (error) {
-//     console.error('Error occurred during crawling:', error);
-//   }
-// };
-
-export {
-  processPage,
-  crawl
-}
+export { processPage, crawl, toAbsoluteUrl }
+export default main;

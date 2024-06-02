@@ -1,5 +1,5 @@
 // Import the functions from the crawlWebsiteConnectedness.ts file
-import { processPage, crawl } from './crawlWebsiteConnectedness';
+import main from './crawlWebsiteConnectedness';
 
 // Export the functions
-export { processPage, crawl };
+export default main;

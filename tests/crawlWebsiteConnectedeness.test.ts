@@ -1,6 +1,6 @@
 
 import puppeteer, { Page, Browser } from 'puppeteer';
-import { processPage, crawl } from '../src/crawlWebsiteConnectedness';
+import { processPage, crawl, toAbsoluteUrl } from '../src/crawlWebsiteConnectedness';
 
 afterEach(() => jest.resetAllMocks());
 
@@ -45,6 +45,27 @@ beforeEach(() => {
   jest.spyOn(puppeteer, 'launch').mockResolvedValue(mockBrowser as Browser);
 });
 
+describe('toAbsoluteUrl', () => {
+  it('should correctly resolve relative URLs to absolute URLs', () => {
+    const baseUrl = 'http://example.com';
+    const relativeUrl = '/test';
+    const expectedUrl = 'http://example.com/test';
+
+    const result = toAbsoluteUrl(relativeUrl, baseUrl);
+
+    expect(result).toEqual(expectedUrl);
+  });
+
+  it('should return the relative URL if no base URL is provided', () => {
+    const relativeUrl = '/test';
+    const expectedUrl = '/test';
+
+    const result = toAbsoluteUrl(relativeUrl);
+
+    expect(result).toEqual(expectedUrl);
+  });
+});
+
 describe('processPage', () => {
   test('should process a page correctly', async () => {
     const currentUrl = 'http://test.com/page1';
@@ -62,11 +83,12 @@ describe('processPage', () => {
 
 describe('crawl', () => {
   test('should crawl the website and return the correct result', async () => {
-    const queue = ['http://test.com/page1', 'http://test.com/page2'];
+    const startPoint = 'http://test.com';
+    const queue = ['http://test.com/page1', 'http://test.com/page2', 'http://test1.com/page2'];
     const visited = new Set<string>();
     const result = {};
     const logSpy = jest.spyOn(console, 'log');
-    const finalResult = await crawl(queue, visited, result, true);
+    const finalResult = await crawl(startPoint, queue, visited, result, true);
 
     expect(finalResult).toEqual({ // it will call processPage twice
       'http://test.com/page1': [
@@ -96,12 +118,13 @@ describe('crawl', () => {
   });
 
   test('should crawl only the required path if provided', async () => {
+    const startPoint = 'http://test.com';
     const queue = ['http://test.com/page1', 'http://test.com/page2'];
     const visited = new Set<string>();
     const result = {};
     const logSpy = jest.spyOn(console, 'log');
     const requiredPath = 'page1';
-    const resultWithRequiredPath = await crawl(queue, visited, result, true, requiredPath);
+    const resultWithRequiredPath = await crawl(startPoint, queue, visited, result, true, requiredPath);
 
     // Expect only the required path and its posts to be crawled
     expect(resultWithRequiredPath).toEqual({
