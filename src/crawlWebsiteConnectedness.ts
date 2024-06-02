@@ -3,6 +3,7 @@ import fs from 'fs';
 // import randomColor from 'randomcolor';
 import puppeteer from 'puppeteer';
 import path from 'path';
+import url from 'url';
 
 // const giveColorByGroupTo = (nodes: { id: number, name: string, url: string, group: any, color?: string }[]) => {
 //   const groups = [...new Set(nodes.map(node => node.group))];
@@ -60,7 +61,11 @@ import path from 'path';
 //   items.push(item);
 // }
 
-const processPage = async (currentUrl: string) => {
+const toAbsoluteUrl = (relativeUrl: string, baseUrl: string = '') => {
+  return url.resolve(baseUrl, relativeUrl);
+};
+
+const processPage = async (currentUrl: string, baseUrl: string = '') => {
   const childUrls: string[] = [];
   const browser = await puppeteer.launch();
   const page = await browser.newPage();
@@ -74,7 +79,7 @@ const processPage = async (currentUrl: string) => {
     const href = $(link).attr('href');
     // should add picky mechanism
     if (href && !href.includes('#')) {
-      childUrls.push(href);
+      childUrls.push(toAbsoluteUrl(href, baseUrl));
     }
   });
   await browser.close();
@@ -87,7 +92,8 @@ const crawl = async (
   visited: Set<string> = new Set(),
   result: { [key: string]: string[] } = {},
   shouldLog: boolean = false,
-  requiredPath: string = ''
+  requiredPath: string = '',
+  baseUrl: string = ''
 ): Promise<{ [key: string]: string[] }> => {
   const currentUrl = queue.shift();
 
@@ -98,13 +104,13 @@ const crawl = async (
     if (shouldLog) {
       console.log(`Crawling: ${currentUrl}`); // Log the current URL
     }
-    const childUrls = await processPage(currentUrl);
+    const childUrls = await processPage(currentUrl, baseUrl);
     visited.add(currentUrl);
     result[currentUrl] = childUrls;
     queue.push(...childUrls);
   }
 
-  return await crawl(queue, visited, result, shouldLog, requiredPath);
+  return await crawl(queue, visited, result, shouldLog, requiredPath, baseUrl);
 }
 
 // const storeSearchBarAsFile = (filePath, result) => {
