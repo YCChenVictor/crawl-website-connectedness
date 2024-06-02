@@ -107,7 +107,7 @@ const crawl = async (
     const childUrls = await processPage(currentUrl, baseUrl);
     visited.add(currentUrl);
     result[currentUrl] = childUrls;
-    queue.push(...childUrls);
+    queue.push(...childUrls.filter(url => !visited.has(url)));
   }
 
   return await crawl(queue, visited, result, shouldLog, requiredPath, baseUrl);
