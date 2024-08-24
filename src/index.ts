@@ -1,5 +1,3 @@
-// Import the functions from the crawlWebsiteConnectedness.ts file
-import main from './crawlWebsiteConnectedness';
+import main from './crawl-website-connectedness';
 
-// Export the functions
 export default main;

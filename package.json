@@ -12,20 +12,19 @@
     "@types/jest": "^29.5.12",
     "jest": "^29.7.0",
     "ts-jest": "^29.1.4",
-    "ts-node": "^10.9.2",
-    "tsc-alias": "^1.8.10",
-    "typescript": "^5.4.5"
+    "tsc-alias": "^1.8.10"
   },
   "files": [
     "dist",
     "README.md"
   ],
   "scripts": {
-    "build": "tsc && tsc-alias",
+    "compile": "tsc && tsc-alias",
     "test": "jest"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
-    "puppeteer": "^22.10.0"
+    "puppeteer": "^23.1.1",
+    "typescript": "^5.5.4"
   }
 }
