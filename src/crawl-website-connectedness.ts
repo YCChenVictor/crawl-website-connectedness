@@ -45,6 +45,7 @@ const crawl = async (
     result[currentUrl] = childUrls;
     queue.push(...childUrls.filter(url => !visited.has(url)));
   }
+  visited.add(currentUrl);
 
   return await crawl(queue, baseUrl ,requiredPath, shouldLog, visited, result);
 }
