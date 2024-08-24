@@ -26,7 +26,6 @@ const processPage = async (currentUrl: string, baseUrl: string = '') => {
 }
 
 const crawl = async (
-  startPoint: string,
   queue: string[],
   baseUrl: string,
   requiredPath: string,
@@ -47,12 +46,8 @@ const crawl = async (
     queue.push(...childUrls.filter(url => !visited.has(url)));
   }
 
-  return await crawl(startPoint, queue, baseUrl ,requiredPath, shouldLog, visited, result);
+  return await crawl(queue, baseUrl ,requiredPath, shouldLog, visited, result);
 }
 
-const main = (endPoint: string) => {
-  return crawl(endPoint, [endPoint], endPoint, endPoint, true);
-}
-
-export { processPage, crawl, toAbsoluteUrl }
-export default main;
+export { processPage, toAbsoluteUrl }
+export default crawl;
