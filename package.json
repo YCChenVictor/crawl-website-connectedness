@@ -1,6 +1,6 @@
 {
   "name": "crawl-website-connectedness",
-  "version": "0.1.13",
+  "version": "1.0.0",
   "description": "Scrape websites connectedness",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
