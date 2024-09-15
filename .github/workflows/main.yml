@@ -14,5 +14,7 @@ jobs:
         node-version: '22'
     - name: Install dependencies
       run: yarn install --frozen-lockfile # the yarn.lock is updated according to the node version
+    - name: Lint Code
+      run: yarn eslint
     - name: Run tests
       run: yarn test:fix
