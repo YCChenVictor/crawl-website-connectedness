@@ -1,6 +1,6 @@
 
 import puppeteer, { Page, Browser } from 'puppeteer';
-import { processPage, crawl, toAbsoluteUrl } from '../src/crawl-website-connectedness';
+import crawl, { processPage, toAbsoluteUrl } from '../src/crawl-website-connectedness';
 
 afterEach(() => jest.resetAllMocks());
 
@@ -67,7 +67,7 @@ describe('toAbsoluteUrl', () => {
 });
 
 describe('processPage', () => {
-  test('should process a page correctly', async () => {
+  it('should process a page correctly', async () => {
     const currentUrl = 'http://test.com/page1';
 
     const childUrls = await processPage(currentUrl);
@@ -82,13 +82,13 @@ describe('processPage', () => {
 });
 
 describe('crawl', () => {
-  test('should crawl the website and return the correct result', async () => {
-    const startPoint = 'http://test.com';
+  it('should crawl the website and return the correct result', async () => {
     const queue = ['http://test.com/page1', 'http://test.com/page2', 'http://test1.com/page2'];
+    const baseUrl = 'http://test.com';
     const visited = new Set<string>();
     const result = {};
     const logSpy = jest.spyOn(console, 'log');
-    const finalResult = await crawl(startPoint, queue, visited, result, true);
+    const finalResult = await crawl(queue, baseUrl, baseUrl, true);
 
     expect(finalResult).toEqual({ // it will call processPage twice
       'http://test.com/page1': [
@@ -110,21 +110,13 @@ describe('crawl', () => {
     // Check if console.log was called with the correct arguments
     expect(logSpy).toHaveBeenCalledWith('Crawling: http://test.com/page1');
     expect(logSpy).toHaveBeenCalledWith('Crawling: http://test.com/page2');
-
-    // Jest does not know ES6. It sees the imported processPage are different from the transpiled one. I cannot resolve it now.
-    // expect(processPage).toHaveBeenCalledTimes(2);
-    // expect(processPage).toHaveBeenCalledWith('http://test.com/page1');
-    // expect(processPage).toHaveBeenCalledWith('http://test.com/page2');
   });
 
-  test('should crawl only the required path if provided', async () => {
-    const startPoint = 'http://test.com';
+  it('should crawl only the required path if provided', async () => {
     const queue = ['http://test.com/page1', 'http://test.com/page2'];
-    const visited = new Set<string>();
-    const result = {};
-    const logSpy = jest.spyOn(console, 'log');
+    const baseUrl = 'http://test.com';
     const requiredPath = 'page1';
-    const resultWithRequiredPath = await crawl(startPoint, queue, visited, result, true, requiredPath);
+    const resultWithRequiredPath = await crawl(queue, baseUrl, requiredPath, true);
 
     // Expect only the required path and its posts to be crawled
     expect(resultWithRequiredPath).toEqual({
@@ -139,64 +131,3 @@ describe('crawl', () => {
     });
   });
 });
-
-// describe('crawlWebsiteConnectedness', () => {
-//   it('getIdFromNodeName', () => {
-//     // Setup
-//     const nodes = [{ id: 1, name: 'name', url: 'url', group: 'group' }];
-//     const url = 'url';
-
-//     // Exercise
-//     const result = crawlWebsiteConnectedness.getIdFromNodeName(nodes, url);
-
-//     // Verify
-//     // Check that result is as expected...
-//   })
-//   it('storeSearchBarAsFile', )
-//   it('crawl function should return expected result', async () => {
-//     // Setup
-//     const queue = ['http://example.com'];
-//     const visited = new Set<string>();
-//     const domain = 'http://example.com';
-
-//     // Mock network requests here...
-
-//     // Exercise
-//     const result = await crawl(queue, visited, domain);
-
-//     // Verify
-//     // Check that result is as expected...
-//   });
-
-//   it('storeNodeGraphAsFile function should write expected data to file', () => {
-//     // Setup
-//     const nodeGraph = { /* ... */ };
-//     const filePath = './test.txt';
-
-//     // Mock file system here...
-
-//     // Exercise
-//     storeNodeGraphAsFile(nodeGraph, filePath);
-
-//     // Verify
-//     // Check that file system was written to as expected...
-//   });
-
-//   it('main function should call crawl and storeNodeGraphAsFile with expected arguments', async () => {
-//     // Setup
-//     const queue = ['http://example.com'];
-//     const visited = new Set<string>();
-//     const domain = 'http://example.com';
-//     const filePath = './test.txt';
-
-//     const mockCrawl = mocked(crawl, true);
-//     const mockStoreNodeGraphAsFile = mocked(storeNodeGraphAsFile, true);
-
-//     // Exercise
-//     await main(queue, visited, domain, filePath);
-
-//     // Verify
-//     expect(mockCrawl).toHaveBeenCalledWith(queue, visited, domain);
-//     // Check that mockStoreNodeGraphAsFile was called with expected arguments...
-//   });
-// });
