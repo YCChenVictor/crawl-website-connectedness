@@ -25,7 +25,8 @@
     "compile": "tsc && tsc-alias",
     "eslint": "eslint",
     "eslint:fix": "eslint --fix",
-    "test": "jest"
+    "test": "jest",
+    "test:fix": "jest --bail"
   },
   "dependencies": {
     "cheerio": "^1.0.0-rc.12",
