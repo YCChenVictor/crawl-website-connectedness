@@ -4,23 +4,18 @@ import prettierPlugin from "eslint-plugin-prettier";
 
 export default tseslint.config(
   eslint.configs.recommended,
-  ...tseslint.configs.recommendedTypeChecked,
-  ...tseslint.configs.stylisticTypeChecked,
+  ...tseslint.configs.strict,
+  ...tseslint.configs.stylistic,
   {
     ignores: [
       '**/coverage/**',
       '**/dist/**',
       '**/migrations/**',
       '**/*.config.js',
-      '**/*.config.ts',
+      '**/*.config.ts'
     ],
   },
   {
-    languageOptions: {
-      parserOptions: {
-        project: true,
-      },
-    },
     plugins: {
       prettier: prettierPlugin,
     },
@@ -28,4 +23,4 @@ export default tseslint.config(
       "prettier/prettier": "error",
     },
   },
-)
+);
