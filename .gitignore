@@ -3,6 +3,7 @@ node_modules/
 .env
 
 /dist
+/npm
 
 # These are files to test this project
 script.js

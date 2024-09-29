@@ -19,11 +19,13 @@
     "tsc-alias": "^1.8.10"
   },
   "files": [
-    "dist",
+    "npm",
     "README.md"
   ],
   "scripts": {
-    "compile": "tsc && tsc-alias",
+    "start:dev": "NODE_ENV=dev yarn compile:dev && node dist/script.js --experimental-modules",
+    "compile:dev": "tsc --project tsconfig.dev.json && tsc-alias --project tsconfig.dev.json",
+    "compile:npm": "tsc --project tsconfig.npm.json && tsc-alias --project tsconfig.npm.json",
     "eslint": "eslint",
     "eslint:fix": "eslint --fix",
     "test": "jest",
