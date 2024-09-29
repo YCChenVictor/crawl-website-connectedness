@@ -38,6 +38,13 @@ yarn test
 yarn dev
 ```
 
+## Compile and upload to npm
+
+```bash
+yarn compile:npm
+npm publish
+```
+
 ## Contributing
 
 Contributions are welcome! Please follow the guidelines for submitting pull requests.
