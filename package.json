@@ -23,9 +23,9 @@
     "README.md"
   ],
   "scripts": {
-    "dev": "NODE_ENV=dev yarn start",
-    "start": "yarn compile && node dist/script.js --experimental-modules",
-    "compile": "tsc && tsc-alias",
+    "start:dev": "NODE_ENV=dev yarn compile:dev && node dist/script.js --experimental-modules",
+    "compile:dev": "tsc --project tsconfig.dev.json && tsc-alias --project tsconfig.dev.json",
+    "compile:npm": "tsc --project tsconfig.build.json && tsc-alias --project tsconfig.build.json",
     "eslint": "eslint",
     "eslint:fix": "eslint --fix",
     "test": "jest",
