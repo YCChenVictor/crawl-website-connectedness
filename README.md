@@ -32,6 +32,12 @@ const result = await crawl(
 yarn test
 ```
 
+## Run this script for development
+
+```bash
+yarn dev
+```
+
 ## Contributing
 
 Contributions are welcome! Please follow the guidelines for submitting pull requests.

@@ -23,6 +23,8 @@
     "README.md"
   ],
   "scripts": {
+    "dev": "NODE_ENV=dev yarn start",
+    "start": "yarn compile && node dist/script.js --experimental-modules",
     "compile": "tsc && tsc-alias",
     "eslint": "eslint",
     "eslint:fix": "eslint --fix",
